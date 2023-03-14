@@ -1,2 +1,2 @@
 #!/bin/bash
-echo $num | tr " " "\n" | grep -v "oo"
+printf "%.2f\n" $NUM
