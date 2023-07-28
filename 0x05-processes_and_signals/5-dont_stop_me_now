@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
-# infinity loop and kill it
-kill "$(pgrep -f 4-to_infinity_and_beyond)"
+# Kill A Process
+
+# get 4-to_infinity_and_beyond prosses id
+pid=$(pgrep -f './4-to_infinity_and_beyond')
+# end the prosses
+kill "$pid"	
