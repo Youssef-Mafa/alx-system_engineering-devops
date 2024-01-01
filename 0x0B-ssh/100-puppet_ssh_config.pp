@@ -1,16 +1,9 @@
-# Configure SSH client to use private key for authentication
-include stdlib
-
-file_line { 'Turn off password authentication':
-  ensure  => present,
-  path    => '/etc/ssh/ssh_config',
-  line    => 'PasswordAuthentication no',
-  replace => true,
+# Client configuration file with Puppet
+file_line {  'passw_no_autentication':
+  path => '/etc/ssh/ssh_config',
+  line => 'PasswordAuthentication no',
 }
-
-file_line { 'Configure private key':
-  ensure  => present,
-  path    => '/etc/ssh/ssh_config',
-  line    => 'IdentityFile ~/.ssh/school',
-  replace => true,
+file_line {  'passw_direction':
+  path => '/etc/ssh/ssh_config',
+  line => 'IdentityFile ~/.ssh/school',
 }
