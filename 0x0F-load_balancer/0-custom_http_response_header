@@ -4,11 +4,15 @@
 # The value of the custom HTTP header must be the hostname of the server Nginx is running on
 # Write 0-custom_http_response_header so that it configures a brand new Ubuntu machine to the requirements asked in this task
 # Ignore SC2154 for shellcheck
-sudo apt-get -y update
-sudo apt-get -y install nginx
-sudo ufw allow 'Nginx HTTP'
-sudo sh -c 'echo "Hello World!" > /var/www/html/index.nginx-debian.html'
-sudo sh -c 'printf "This n'\''is not a page\n" > /var/www/html/404.html'
-sudo sed -i '24i\  add_header X-Served-By $HOSTNAME;\n' /etc/nginx/sites-available/default
+var=$(hostname)
+new_string="error_page 404 \/custom_404.html;\n location \/redirect_me {\n return 301 \$scheme:\/\/www.google.com;"
+new_string2="server {\n\tadd_header X-Served-By $var;"
+
+apt-get update -y
+apt-get install nginx -y
+echo "Hello World!" > /usr/share/nginx/html/index.html
+mkdir -p /var/www/html
+echo "This is not a page" > /var/www/html/custom_404.html
+sudo sed -i -E "s/^[^#]+location \/ \{/$new_string/" /etc/nginx/sites-available/default
+sudo sed -i -E "s/^server \{/$new_string2/" /etc/nginx/sites-available/default
 sudo service nginx start
-sudo nginx -s reload
