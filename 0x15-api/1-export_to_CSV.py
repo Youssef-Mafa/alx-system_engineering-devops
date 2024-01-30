@@ -1,36 +1,36 @@
 #!/usr/bin/python3
-"""gather data from API save to csv"""
-
+"""Script that uses REST API"""
 import csv
 import requests
-from sys import argv
+import sys
+
+
+def make_csv(users=None, todos=None):
+    """Turns payloads into CSV format"""
+    titles = ["USER_ID", "USERNAME", "TASK_COMPLETED_STATUS", "TASK_TITLE"]
+
+    with open(sys.argv[1] + ".csv", "w") as f:
+        write = csv.DictWriter(f, fieldnames=titles, quoting=csv.QUOTE_ALL)
+        for i in todos:
+            write.writerow({"USER_ID": i.get("userId"),
+                            "USERNAME": users[0].get("username"),
+                            "TASK_COMPLETED_STATUS": i.get("completed"),
+                            "TASK_TITLE": i.get("title")})
+
 
 if __name__ == "__main__":
-    try:
-        user_ID = int(argv[1])
-    except Exception as a:
-        exit()
+    if len(sys.argv) == 2 and sys.argv[1].isdigit():
+        args_id = {"id": sys.argv[1]}
+        users = requests.get("https://jsonplaceholder.typicode.com/users",
+                             params=args_id).json()
+        args_userid = {"userId": sys.argv[1]}
+        todos = requests.get("https://jsonplaceholder.typicode.com/todos",
+                             params=args_userid).json()
+        todos_len = 0
+        todos_arr = []
+        for i in todos:
+            if i.get("completed"):
+                todos_arr.append(i)
+                todos_len += 1
 
-    URL = 'https://jsonplaceholder.typicode.com'
-    # get employee name
-    employee_data = requests.get(f'{URL}/users/{user_ID}').json()
-    if employee_data == {}:
-        exit()
-    username = employee_data.get('username')
-
-    # get all Tasks for all employees
-    tasks_list = requests.get(f'{URL}/todos').json()
-
-    employee_tasks_list = []
-    for task in tasks_list:
-        if task.get('userId') == user_ID:
-            employee_tasks_list.append(task)
-
-    with open(f'{user_ID}.csv', 'w', newline='') as file:
-        writer = csv.writer(file, quoting=csv.QUOTE_NONNUMERIC)
-        # "USER_ID","USERNAME","TASK_COMPLETED_STATUS","TASK_TITLE"
-        for task in employee_tasks_list:
-            writer.writerow([f"{user_ID}",
-                            f"{username}",
-                            f"{task.get('completed')}",
-                            f"{task.get('title')}"])
+        make_csv(users, todos)
